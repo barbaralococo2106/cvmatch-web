@@ -31,6 +31,7 @@ export default function Home() {
     })
 
     const data = await response.json()
+    console.log('ID del análisis:', data.id)
     setResult(data)
     setLoading(false)
   }
@@ -122,14 +123,89 @@ export default function Home() {
         </button>
 
         {/* Resultado temporal — para verificar que funciona */}
+        {/* Resultados completos */}
         {result && (
-          <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">
-            <p className="text-purple-400 font-bold text-lg mb-2">
-              Score: {result.score?.overall_score}/100
-            </p>
-            <p className="text-gray-400 text-sm">
-              ID: {result.id}
-            </p>
+          <div className="space-y-6 mt-4">
+
+            {/* Score */}
+            <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Compatibilidad</h2>
+                <span className="text-3xl font-bold text-purple-400">
+                  {result.score?.overall_score}/100
+                </span>
+              </div>
+              <div className="space-y-3">
+                {Object.entries(result.score?.subscores || {}).map(([key, val]: any) => (
+                  <div key={key}>
+                    <div className="flex justify-between text-sm mb-1">
+                      <span className="text-gray-400 capitalize">{key.replace(/_/g, ' ')}</span>
+                      <span className="text-white">{val.score}/100</span>
+                    </div>
+                    <div className="w-full bg-[#1E1E2E] rounded-full h-1.5">
+                      <div
+                        className="bg-purple-500 h-1.5 rounded-full"
+                        style={{ width: `${val.score}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Keywords faltantes */}
+            {result.score?.missing_critical?.length > 0 && (
+              <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">
+                <h2 className="text-lg font-bold mb-4">Keywords faltantes</h2>
+                <div className="flex flex-wrap gap-2">
+                  {result.score.missing_critical.map((item: any) => (
+                    <span
+                      key={item.keyword}
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        item.urgency === 'blocking'
+                          ? 'bg-red-900/50 text-red-300 border border-red-800'
+                          : 'bg-yellow-900/50 text-yellow-300 border border-yellow-800'
+                      }`}
+                    >
+                      {item.keyword}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CV Reescrito */}
+            <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">CV Optimizado</h2>
+                <button
+                  onClick={() => window.open(`http://localhost:8000/analyses/${result.id}/download-cv`, '_blank')}
+                  className="text-xs bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  Descargar PDF →
+                </button>
+              </div>
+              <pre className="text-gray-400 text-xs whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+                {result.rewritten_cv}
+              </pre>
+            </div>
+
+            {/* Cover Letter */}
+            <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold">Cover Letter</h2>
+                <button
+                  onClick={() => window.open(`http://localhost:8000/analyses/${result.id}/download-cover-letter`, '_blank')}
+                  className="text-xs bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
+                >
+                  Descargar PDF →
+                </button>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed max-h-48 overflow-y-auto whitespace-pre-wrap">
+                {result.cover_letter}
+              </p>
+            </div>
+
           </div>
         )}
 
