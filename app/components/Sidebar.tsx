@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 
 // Configuración del menú: para sumar una sección nueva, agregá un objeto acá.
 const MENU_ITEMS = [
@@ -98,6 +99,29 @@ export default function Sidebar() {
             )
           })}
         </nav>
+
+        {/* Control de sesión (Clerk), al final del panel */}
+        <div className="mt-auto pt-6 border-t border-[#1E1E2E]">
+          <Suspense fallback={null}>
+            <Show when="signed-out">
+              <div className="space-y-2">
+                <SignInButton>
+                  <button className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold py-3 rounded-xl transition-colors">
+                    Iniciar sesión
+                  </button>
+                </SignInButton>
+                <SignUpButton>
+                  <button className="w-full bg-[#13131A] border border-purple-500 text-purple-300 hover:bg-purple-600/20 text-sm font-semibold py-3 rounded-xl transition-colors">
+                    Crear cuenta
+                  </button>
+                </SignUpButton>
+              </div>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
+          </Suspense>
+        </div>
       </aside>
     </>
   )
