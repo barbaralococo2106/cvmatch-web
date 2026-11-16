@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 export default function Home() {
   // Estado — variables que guardan lo que escribe el usuario
@@ -126,6 +127,13 @@ export default function Home() {
         {/* Resultados completos */}
         {result && (
           <div className="space-y-6 mt-4">
+
+            <Link
+              href={`/historial/${result.id}`}
+              className="inline-block text-sm text-purple-400 hover:text-purple-300"
+            >
+              Ver este análisis en mis análisis →
+            </Link>
 
             {/* Score */}
             <div className="bg-[#13131A] border border-[#1E1E2E] rounded-xl p-6">

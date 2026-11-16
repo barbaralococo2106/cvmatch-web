@@ -3,6 +3,35 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import ReactMarkdown, { type Components } from 'react-markdown'
+
+// Saca el prefijo "REWRITTEN CV:" del primer título y deja solo el nombre.
+// Si el título fuera únicamente "REWRITTEN CV", borra la línea entera.
+function limpiarCV(markdown: string) {
+  return markdown
+    .replace(/^#+\s*REWRITTEN CV\s*:?\s*$\n?/im, '')
+    .replace(/^(#+\s*)REWRITTEN CV\s*:\s*/im, '$1')
+    .trim()
+}
+
+// Cómo se dibuja cada elemento de markdown, con clases de Tailwind.
+const estilosMarkdown: Components = {
+  h1: ({ children }) => <h3 className="text-lg font-bold text-white mb-2">{children}</h3>,
+  h2: ({ children }) => (
+    <h4 className="text-sm font-bold text-purple-400 uppercase tracking-wide mt-5 mb-2">{children}</h4>
+  ),
+  h3: ({ children }) => <h5 className="text-sm font-semibold text-white mt-3 mb-1">{children}</h5>,
+  p: ({ children }) => <p className="mb-2">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold text-gray-200">{children}</strong>,
+  ul: ({ children }) => <ul className="list-disc pl-5 mb-2 space-y-1">{children}</ul>,
+  ol: ({ children }) => <ol className="list-decimal pl-5 mb-2 space-y-1">{children}</ol>,
+  hr: () => <hr className="border-[#1E1E2E] my-4" />,
+  a: ({ children, href }) => (
+    <a href={href} target="_blank" rel="noreferrer" className="text-purple-400 hover:underline">
+      {children}
+    </a>
+  ),
+}
 
 type Analysis = {
   id: string
@@ -118,9 +147,11 @@ export default function DetalleAnalisis() {
                   Descargar PDF →
                 </button>
               </div>
-              <pre className="text-gray-400 text-xs whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
-                {analysis.rewritten_cv}
-              </pre>
+              <div className="text-gray-400 text-sm leading-relaxed max-h-96 overflow-y-auto pr-2">
+                <ReactMarkdown components={estilosMarkdown}>
+                  {limpiarCV(analysis.rewritten_cv)}
+                </ReactMarkdown>
+              </div>
             </div>
 
             {/* Cover letter */}
